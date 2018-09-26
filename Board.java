@@ -10,14 +10,17 @@
  */
 package pkg420;
 import java.util.Scanner;
+import java.util.Random;
+import java.util.Vector;
+import java.util.Arrays;
 /**
  *
  * @author josue
  */
 public class Board 
 {
-
     private int[] board;
+    private Vector<Arrays> createdBoards;
 
     public Board() {
         board = generator();
@@ -34,7 +37,7 @@ public class Board
             parseAccepted(input);
         } else {
             System.out.println("Error: random puzzle generated!");
-            board = generator();
+            board = new int[] {0,1,2,3,4,5,6,7,8};
         }
     }
 
@@ -92,7 +95,69 @@ public class Board
         return counter;
     }
     
-    public static Board moveZero(Board board, int zeroPos, int newPos) {
+    public static int[] generateRandom(int n) {
+        int[] puzzle = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+        Vector<Board> boards = new Vector<>();
+        boards.add(new Board(puzzle));
+        for(int i = 0; i < n; i++) {
+            Random rand = new Random();
+            int randCase = rand.nextInt(4);
+            int zeroPos = findZero(puzzle);
+            int x = zeroPos % 3;
+            int y = zeroPos / 3;
+            switch(randCase) {
+                case 0:
+                    if(moveCheck(x, y - 1)) puzzle = moveZero(puzzle, zeroPos, zeroPos - 3);
+                    else puzzle = moveZero(puzzle, zeroPos, zeroPos + 3);
+                    break;
+                case 1:
+                    if (moveCheck(x, y + 1))
+                        puzzle = moveZero(puzzle, zeroPos, zeroPos + 3);
+                    else
+                        puzzle = moveZero(puzzle, zeroPos, zeroPos - 3);
+                    break;
+                case 2:
+                    if (moveCheck(x - 1, y))
+                        puzzle = moveZero(puzzle, zeroPos, zeroPos - 1);
+                    else
+                        puzzle = moveZero(puzzle, zeroPos, zeroPos + 1);
+                    break;
+                default:
+                    if (moveCheck(x + 1, y))
+                        puzzle = moveZero(puzzle, zeroPos, zeroPos + 1);
+                    else
+                        puzzle = moveZero(puzzle, zeroPos, zeroPos - 1);
+                    break;
+            }
+            Board tempBoard = new Board(puzzle);
+            if(boards.contains(tempBoard)) {
+                i--;
+            } else {
+                boards.add(tempBoard);
+            }
+        }
+        return puzzle;
+    }
+    
+    private static int findZero(int[] board) {
+        for (int i = 0; i < 9; i++) {
+            if (board[i] == 0)
+                return i;
+        }
+        return 8;
+    }
+
+    public static int[] moveZero(int[] board, int zeroPos, int newPos) {
+        int[] newBoard = new int[9];
+        System.arraycopy(board, 0, newBoard, 0, 9);
+        if (moveCheck(newPos % 3, newPos / 3)) {
+            newBoard[zeroPos] = newBoard[newPos];
+            newBoard[newPos] = 0;
+        }
+        return newBoard;
+    }
+    
+    public static int[] moveZero(Board board, int zeroPos, int newPos) {
         int[] tempBoard = board.getArray();
         int[] newBoard = new int[9];
         System.arraycopy(tempBoard, 0, newBoard, 0, 9);
@@ -100,7 +165,7 @@ public class Board
             newBoard[zeroPos] = newBoard[newPos];
             newBoard[newPos] = 0;
         }
-        return new Board(newBoard);
+        return newBoard;
     }
 
     private static boolean isSolvable(int[] board) {
@@ -109,7 +174,7 @@ public class Board
 
     public static boolean isGoal(int[] board) {
         for (int i = 0; i < 9; i++) {
-            if (board[i] != 0 && board[i] != i + 1) {
+            if (board[i] != 0 && board[i] != i) {
                 return false;
             }
         }

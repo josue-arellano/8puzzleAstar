@@ -49,12 +49,12 @@ public class BoardNode implements Comparable {
 
     private int getH2() {
         int manhattan = 0;
-        int[] board;
-        board = this.getBoard().getArray();
+        int[] tempBoard;
+        tempBoard = this.getBoard().getArray();
         for (int i = 0; i < 9; i++)
-            if (board[i] != 0) {
-                int distance = Math.abs(((int) i / 3) - ((int) (board[i] - 1) / 3))
-                        + Math.abs((i % 3) - ((board[i] - 1) % 3));
+            if (tempBoard[i] != 0) {
+                int distance = Math.abs(((int) i / 3) - ((int) tempBoard[i] / 3))
+                        + Math.abs((i % 3) - (tempBoard[i] % 3));
                 manhattan += distance;
             }
         return manhattan;
@@ -63,15 +63,16 @@ public class BoardNode implements Comparable {
     private int getH1() {
         int misplacedTiles = 0;
         int tempBoard[];
-        tempBoard = this.getBoardArray();
+        tempBoard = getBoardArray();
         for (int i = 0; i < 9; i++) {
-            if (tempBoard[i] != 0 && tempBoard[i] != i + 1) {
+            if (tempBoard[i] != 0 && tempBoard[i] != i) {
                 misplacedTiles++;
             }
         }
         return misplacedTiles;
     }
 
+    @Override
     public int compareTo(Object o) {
         BoardNode other = (BoardNode) o;
         if (f > other.f) {
@@ -111,6 +112,7 @@ public class BoardNode implements Comparable {
         this.parent = parent;
     }
 
+    @Override
     public String toString() {
         int[] tempBoard = this.getBoardArray();
         String boardStr = "";
